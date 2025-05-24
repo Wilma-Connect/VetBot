@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>VetBot – Bienvenue</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="styles/header.css">
+</head>
+<body class="bg-[#212121] text-white min-h-screen flex items-center justify-center p-4">
+  <header class="header">
+    <div class="header-nav">
+      <div class="flex items-center gap-3">
+      </div>
+      <div class="flex items-center gap-3">
+        <button id="authButton" class="auth-button">Se connecter</button>
+        <button id="" class="b2">S'inscrire</button>
+      </div>
+    </div>
+  </header>
+  <form id="contextForm" class="bg-white text-black w-full max-w-md p-6 rounded-lg shadow space-y-4">
+    <div class="logo flex justify-center">
+        <img src="assets/vetbot-logo.png" alt="VetBot Logo" class="w-16 h-auto">
+        <!-- <h1>VetBot</h1> -->
+    </div>
+    <h1 class="text-xl font-bold text-center">Bienvenue sur VetBot</h1>
+    <p class="text-sm text-center">Répondez à ces questions pour personnaliser votre expérience</p>
+    <select name="experience" required class="w-full p-2 rounded bg-gray-100">
+      <option value="">Votre niveau d'expérience</option>
+      <option value="débutant">Débutant</option>
+      <option value="intermédiaire">Intermédiaire</option>
+      <option value="expérimenté">Expérimenté</option>
+    </select>
+    <input name="animal" type="text" placeholder="Type d'animal" class="w-full p-2 rounded bg-gray-100" />
+    <input name="taille_betail" type="number" placeholder="Nombre d'animaux" class="w-full p-2 rounded bg-gray-100" />
+    <input name="superficie" type="text" placeholder="Superficie" class="w-full p-2 rounded bg-gray-100" />
+    <input name="localisation" type="text" placeholder="Localisation" class="w-full p-2 rounded bg-gray-100" />
+    <button class="bg-green-600 text-white w-full p-2 rounded hover:bg-green-700">Continuer</button>
+  </form>
+  <script>
+    document.getElementById("contextForm").addEventListener("submit", e => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target));
+      localStorage.setItem("vetbot_context", JSON.stringify(data));
+      const params = new URLSearchParams(window.location.search)
+      window.location.href = params.get('next');
+    });
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>

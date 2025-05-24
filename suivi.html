@@ -15,7 +15,9 @@
           <option value="conseils.html">Conseils</option>
           <option value="diagnostic.html">Diagnostic</option>
         </select>
-        <button id="" class="">Historique</button>
+        <a href="historique.html">
+          Historique
+        </a>
       </div>
       <div class="flex items-center gap-3">
         <button id="authButton" class="auth-button">Se connecter</button>
@@ -25,13 +27,13 @@
   </header>
   <h1 class="text-xl font-bold mb-4 text-green-900">Enregistrer un suivi</h1>
   <form class="space-y-4">
-    <input type="text" placeholder="Titre (ex: Vaccin Marek)" class="w-full p-2 rounded bg-green-800/30" />
-    <input type="datetime-local" class="w-full p-2 rounded  bg-green-800/30" />
-    <textarea placeholder="Détails..." class="w-full p-2 rounded bg-green-800/30"></textarea>
+    <input type="text" placeholder="Titre (ex: Vaccin Marek)" class="w-full p-2 rounded bg-white shadow" />
+    <input type="datetime-local" class="w-full p-2 rounded  bg-white shadow" />
+    <textarea placeholder="Détails..." class="w-full p-2 rounded bg-white shadow"></textarea>
     <button type="submit" class="w-full bg-green-600 p-2 rounded">Enregistrer</button>
   </form>
   <div class="mt-6">
-    <h2 class="font-semibold mb-2">Suggestions de rappels</h2>
+    <h2 class="font-semibold mb-2 text-green-900">Suggestions de rappels</h2>
     <ul class="space-y-2">
       <li class="bg-blue-950 text-sm w-fit hover:bg-[#181818] cursor-pointer p-3 rounded">Nettoyage poulailler – tous les lundis</li>
       <li class="bg-blue-950 text-sm w-fit hover:bg-[#181818] cursor-pointer p-3 rounded">Vérification eau – tous les jours à 8h</li>

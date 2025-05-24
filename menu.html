@@ -5,7 +5,34 @@
   <title>VetBot – Menu</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="styles/header.css">
+  <style>
+    .fade-in {
+      animation: fadeIn 0.8s ease forwards;
+      opacity: .5;
+      transform: translateY(20px);
+    }
+  
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+  
 </head>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const cards = document.querySelectorAll(".grid > div");
+
+    cards.forEach((card, index) => {
+      setTimeout(() => {
+        card.classList.add("fade-in");
+      }, index * 150); // décalage progressif
+    });
+  });
+</script>
+
 <body class="bg-[#faf3e8] pt-28 text-white p-6 min-h-screen">
   <header class="header bg-[#faf3e8] mt-1">
     <div class="header-nav flex flex-row justify-between">

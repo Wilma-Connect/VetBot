@@ -143,3 +143,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   })
   
+  <script>
+  document.querySelectorAll(".grid > div").forEach(card => {
+    const link = card.querySelector("a");
+
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      // Fade out toutes les cartes
+      document.querySelectorAll(".grid > div").forEach(el => el.classList.add("fade-out"));
+
+      // Aller à la page après l'animation
+      setTimeout(() => {
+        window.location.href = link.getAttribute("href");
+      }, 500); // Doit correspondre à la durée de fadeOut
+    });
+  });
+</script>

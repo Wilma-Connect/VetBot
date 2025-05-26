@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Message;
+use App\Models\Prestataire;
 use Illuminate\Support\Str;
 use App\Models\Conversation;
 use Illuminate\Http\Request;
@@ -68,6 +69,9 @@ class VetBotController extends Controller
         }
 
 
+
+
+
         // Enregistrement du message utilisateur
         $userMessage = new Message();
         $userMessage->id = Str::uuid();
@@ -76,6 +80,20 @@ class VetBotController extends Controller
         $userMessage->content = $request->content;
         $userMessage->image = $imagePath ?? null; // stocke juste le chemin S3
         $userMessage->save();
+
+         $prestataires = Prestataire::where('adresse', 'LIKE', "%{$conversation->localisation}%")
+            ->limit(5)
+            ->get();
+
+            $prestataireTexte = $prestataires->isEmpty()
+                ? "Aucun prestataire local n'a été trouvé dans la base. Propose un service de livraison national fiable."
+                : $prestataires->map(function ($p) {
+                    return "- **{$p->nomprestataire}**
+                - 📍 Adresse : {$p->adresse}
+                - ☎️ Téléphone : {$p->numero}
+                - ℹ️ Infos : {$p->description}";
+                })->implode("\n\n");
+
 
         // Appel API OpenAI
         $context = "
@@ -103,9 +121,8 @@ class VetBotController extends Controller
             - Dosage et durée du traitement
             - Mode d’administration
             - Prix estimatif en XOF
-            - **Propose un ou plusieurs lieux d’achat réels** en fonction de la localisation donnée :
-                - Si possible, une **pharmacie vétérinaire** ou une **clinique vétérinaire** à proximité.
-                - Si tu n’as pas d’info locale précise, suggère un service de livraison national fiable
+            - **Voici les prestataires vétérinaires ou pharmacies disponibles à proximité** :
+                {$prestataireTexte}
             4. **Mesures d’hygiène et de prévention**
             - Conseils pratiques pour améliorer l’environnement de l’élevage.
 

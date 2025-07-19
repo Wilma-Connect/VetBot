@@ -283,8 +283,6 @@ footer {
 }
 
 .modules {
-  display: flex;
-  flex-wrap: wrap;
   justify-content: center;
   gap: 2rem;
   padding: 3rem 1rem;
@@ -298,8 +296,6 @@ footer {
   box-shadow: var(--box-shadow);
   padding: 2rem;
   flex: 1;
-  min-width: 300px;
-  max-width: 500px;
   text-align: center;
   transition: var(--transition);
   position: relative;
@@ -324,6 +320,7 @@ footer {
 
 .module-description {
   margin: 1rem 0 2rem;
+  font-size: 14px;
   color: var(--text-light);
 }
 

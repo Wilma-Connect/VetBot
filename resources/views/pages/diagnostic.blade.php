@@ -8,10 +8,14 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
-<body class="bg-[#faf3e8] text-white min-h-screen items-center justify-center p-4">
+<body class="bg-[#faf3e8] text-white min-h-screen items-center justify-center px-4  {{ !isset($step) || $step === 'init' ? "" : "pt-16 pb-4" }}">
 
-    <header class="header">
+    {{-- <header class="header">
         <div class="header-nav">
+        <div class="logo">
+            <img src="assets/vetbot-logo.png" alt="VetBot Logo" class="w-auto h-16">
+            <!-- <h1>VetBot</h1> -->
+        </div>
           <div class="flex items-center gap-3">
           </div>
           <div class="flex items-center gap-3">
@@ -19,7 +23,7 @@
             <button id="" class="b2">S'inscrire</button>
           </div>
         </div>
-      </header>
+      </header> --}}
 
       @if(!isset($step) || $step === 'init')
       <div class="flex items-center justify-center min-h-screen">
@@ -51,6 +55,7 @@
             <input name="surface_m2" type="text" placeholder="Superficie" class="w-full p-2 rounded bg-gray-100" />
             <input name="localisation" type="text" placeholder="Localisation" class="w-full p-2 rounded bg-gray-100" />
             <button type="submit" class="bg-green-600 text-white w-full p-2 rounded hover:bg-green-700">Continuer</button>
+            <p class="text-center text-[13px]">Retourner à la <a href="/" class="text-green-600 font-semibold bg-transparent hover:underline p-0">page d'acceuil</a></p>
         </form>
       </div>
 
@@ -58,6 +63,12 @@
 
   <header class="header">
     <div class="header-nav">
+      <div class="logo p-0">
+        <a href="/" class="p-0">
+          <img src="{{asset('assets/vetbot-logo.png')}}" alt="VetBot Logo" class="w-12 h-auto">
+          <!-- <h1>VetBot</h1> -->
+        </a>
+      </div>
       <div class="flex items-center gap-3">
         <select id="pageSelect" class="page-select">
           <option value="suivi.html">Suivi</option>
@@ -68,50 +79,57 @@
           Historique
         </a>
       </div>
-      <div class="flex items-center gap-3">
+      {{-- <div class="flex items-center gap-3">
         <button id="authButton" class="auth-button">Se connecter</button>
         <button id="" class="b2">S'inscrire</button>
-      </div>
+      </div> --}}
     </div>
   </header>
 
   <input type="hidden" id="conversationId" value="{{ $conversation->id }}">
 
   <div class="p-4 border-t border-[#181818] fixed bottom-0 left-0 right-0">
-    <div class="space-y-3 max-h-96 overflow-y-auto mb-4" id="chat">
+    <div class="space-y-3 max-h-[28rem] overflow-y-auto" id="chat">
         <div class="flex-1 overflow-y-auto p-4 space-y-4">
 
             @foreach($messages as $message)
                 <div class="flex {{ $message->role === 'assistant' ? 'justify-start' : 'justify-end' }} mb-2">
                     <div class="
-                        {{ $message->role === 'assistant' ? 'bg-green-800/70' : 'bg-gray-800' }}
-                        max-w-[50%] p-1 rounded-lg break-words
-                    ">
-                        {{-- Message texte --}}
-                        @if($message->content)
-                            <p class="text-sm whitespace-pre-wrap break-words ia-reponse">
-                                {{ $message->content }}
-                            </p>
-                        @endif
+                        {{ $message->role === 'assistant' ? 'bg-green-900' : 'bg-gray-800' }}
+                        max-w-[70%] p-2 rounded-lg break-words
+                        ">
 
                         {{-- Image si elle existe --}}
                         @if($message->image)
                             <img src="{{ Storage::disk('s3')->url($message->image) }}"
                                 alt="Image envoyée"
-                                class="mt-2 w-32 h-42 rounded-lg border border-gray-600" />
+                                class="mb-2 w-32 h-42 rounded-lg border border-gray-600" />
+                        @endif
+
+                        {{-- Message texte --}}
+                        @if($message->content)
+                            <p class="text-xs whitespace-pre-wrap break-words ia-reponse">
+                                {{$message->content }}
+                            </p>
                         @endif
 
                         {{-- Contrôles audio uniquement pour assistant --}}
                         @if($message->role === 'assistant')
                             <div class="flex items-center gap-2 justify-end mt-2">
-                                <button onclick="readAloud(this)" class="text-gray-300 hover:text-white text-sm" title="Écouter">🔊 Écouter</button>
-                                <button onclick="stopVoice()" class="text-red-300 hover:text-white text-sm" title="Arrêter">🔇 Stop</button>
+                                <button onclick="readAloud(this)" class="text-gray-300 hover:text-white px-2 py-1 rounded-full hover:bg-white/30 text-xs flex flex-row gap-2 items-center" title="Écouter">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-volume2-icon lucide-volume-2 size-4"><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></svg>
+                                  Écouter
+                                </button>
+                                <button onclick="stopVoice()" class="text-red-300 hover:text-red-400 text-xs flex flex-row gap-2 items-center px-2 py-1 rounded-full hover:bg-red-300/30" title="Arrêter">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-volume-off-icon lucide-volume-off size-4"><path d="M16 9a5 5 0 0 1 .95 2.293"/><path d="M19.364 5.636a9 9 0 0 1 1.889 9.96"/><path d="m2 2 20 20"/><path d="m7 7-.587.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298V11"/><path d="M9.828 4.172A.686.686 0 0 1 11 4.657v.686"/></svg>
+                                  Stop
+                                </button>
                                 <span id="play-timer" class="text-xs text-gray-400 hidden">0s</span>
                             </div>
                         @endif
 
                         {{-- Timestamp --}}
-                        <div class="text-xs text-gray-400 text-right mt-1">
+                        <div class="text-[10px] italic text-gray-400 text-right mt-1">
                             {{ \Carbon\Carbon::parse($message->created_at)->format('d M Y H:i') }}
                         </div>
                     </div>
@@ -120,11 +138,29 @@
 
         </div>
     </div>
-    <div class="flex items-center gap-2 mb-2 text-sm">
+
+    <div id="loadingMessage" class="flex justify-start mb-2 hidden">
+        <div class="bg-green-200 text-gray-700 px-4 py-2 rounded-lg text-xs animate-pulse flex items-center gap-4">
+            <div class="dot-spinner">
+                <div class="dot-spinner__dot"></div>
+                <div class="dot-spinner__dot"></div>
+                <div class="dot-spinner__dot"></div>
+                <div class="dot-spinner__dot"></div>
+                <div class="dot-spinner__dot"></div>
+                <div class="dot-spinner__dot"></div>
+                <div class="dot-spinner__dot"></div>
+                <div class="dot-spinner__dot"></div>
+            </div>
+            Patientez un instant...
+        </div>
+    </div>
+
+    {{-- <div class="flex items-center gap-2 mb-2 text-sm">
       <span class="text-gray-400">Suggestions :</span>
       <button class="bg-[#181818] px-2 py-1 rounded">Tremblements</button>
       <button class="bg-[#181818] px-2 py-1 rounded">Perte d'appétit</button>
-    </div>
+    </div> --}}
+
     <form action="{{ route('vetbot.send', $conversation) }}" method="POST" enctype="multipart/form-data" id="chatForm" class="flex flex-col gap-2 p-2 bg-green-800/30 rounded-md">
         @csrf
         <div id="vocal-container" class="hidden mb-3">
@@ -146,21 +182,21 @@
               ×
             </button>
           </div>
-                <textarea id="chatInput" name="content" type="text" class="p-2 flex-1 bg-white rounded text-gray-700 text-sm resize-none" placeholder="Décrire les symptômes…" rows="5" ></textarea>
+        <textarea id="chatInput" name="content" type="text" class="p-2 flex-1 bg-white rounded text-gray-700 text-xs resize-none" placeholder="Décrire les symptômes…" rows="3" ></textarea>
 
       <div class="flex items-center justify-between border-t pt-2 border-white/10">
         <label for="imgUpload" class="cursor-pointer p-2 rounded-full hover:bg-white/20">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-paperclip-icon lucide-paperclip"><path d="M13.234 20.252 21 12.3"/><path d="m16 6-8.414 8.586a2 2 0 0 0 0 2.828 2 2 0 0 0 2.828 0l8.414-8.586a4 4 0 0 0 0-5.656 4 4 0 0 0-5.656 0l-8.415 8.585a6 6 0 1 0 8.486 8.486"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-paperclip-icon lucide-paperclip size-4"><path d="M13.234 20.252 21 12.3"/><path d="m16 6-8.414 8.586a2 2 0 0 0 0 2.828 2 2 0 0 0 2.828 0l8.414-8.586a4 4 0 0 0 0-5.656 4 4 0 0 0-5.656 0l-8.415 8.585a6 6 0 1 0 8.486 8.486"/></svg>
         </label>
         <input id="imgUpload" name="image" type="file" class="hidden" />
         <div class="flex items-center gap-5">
           <button type="button" onclick="startVoice()" id="micBtn" class="p-2 rounded-full hover:bg-white/20">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mic-icon lucide-mic"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mic-icon lucide-mic size-4"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
           </button>
           <span id="timer" class="text-xs text-gray-500 hidden">0s</span>
 
           <button type="submit" class="p-2 rounded-full bg-white">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send-horizontal-icon lucide-send-horizontal text-[#181818]"><path d="M3.714 3.048a.498.498 0 0 0-.683.627l2.843 7.627a2 2 0 0 1 0 1.396l-2.842 7.627a.498.498 0 0 0 .682.627l18-8.5a.5.5 0 0 0 0-.904z"/><path d="M6 12h16"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send-horizontal-icon lucide-send-horizontal text-[#181818] size-4"><path d="M3.714 3.048a.498.498 0 0 0-.683.627l2.843 7.627a2 2 0 0 1 0 1.396l-2.842 7.627a.498.498 0 0 0 .682.627l18-8.5a.5.5 0 0 0 0-.904z"/><path d="M6 12h16"/></svg>
           </button>
         </div>
       </div>
@@ -193,17 +229,20 @@
     const formData = new FormData(form);
     const chatInput = document.getElementById('chatInput');
     const chat = document.getElementById('chat');
+    const image = formData.get('image');
 
-    if (!chatInput.value.trim() && !formData.get('image')) {
+    if (!chatInput.value.trim() && (!image || image.size === 0)) {
         alert('Veuillez saisir un message ou sélectionner une image');
         return;
     }
 
     // Ajout message utilisateur (mimique blade)
     const userDiv = document.createElement('div');
-    userDiv.className = 'p-3 rounded relative flex flex-col gap-1 bg-blue-100 text-right';
+    userDiv.className = 'p-3 rounded relative flex flex-col gap-1 bg-gray-800 text-right';
     userDiv.innerHTML = `<p class="text-sm whitespace-pre-wrap ia-reponse">${chatInput.value.trim()}</p>`;
     chat.appendChild(userDiv);
+
+    document.getElementById('loadingMessage').classList.remove('hidden');
 
     try {
         const response = await fetch(form.action, {
@@ -220,7 +259,7 @@
 
         if (result.success) {
             const assistantDiv = document.createElement('div');
-            assistantDiv.className = 'p-3 rounded relative flex flex-col gap-1 bg-green-100 text-left';
+            assistantDiv.className = 'p-3 rounded relative flex flex-col gap-1 bg-green-950 text-left';
             assistantDiv.innerHTML = `
                 <p class="text-sm whitespace-pre-wrap ia-reponse">${result.content}</p>
                 <div class="flex items-center gap-2 justify-end">
@@ -232,22 +271,23 @@
             chat.appendChild(assistantDiv);
         }
 
-    } catch (error) {
-        console.error("Erreur:", error);
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'bg-red-500 text-white p-3 rounded-lg mb-2';
-        errorDiv.textContent = "Erreur lors de l'envoi du message";
-        chat.appendChild(errorDiv);
-    } finally {
-        form.reset();
-        chat.scrollTop = chat.scrollHeight;
+        } catch (error) {
+            console.error("Erreur:", error);
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'bg-red-500 text-white p-3 rounded-lg mb-2';
+            errorDiv.textContent = "Erreur lors de l'envoi du message";
+            chat.appendChild(errorDiv);
+        } finally {
+            form.reset();
+            chat.scrollTop = chat.scrollHeight;
 
-        // ✅ Rafraîchit la page après un petit délai
-        setTimeout(() => {
-            location.reload();
-        }, 500); // Tu peux augmenter/diminuer ce délai
-    }
-});
+            // ✅ Rafraîchit la page après un petit délai
+            setTimeout(() => {
+                location.reload();
+            }, 500); // Tu peux augmenter/diminuer ce délai
+        }
+        document.getElementById('loadingMessage').classList.add('hidden');
+    });
 
   </script>
 
@@ -302,7 +342,6 @@
     }
 
 </script>
-
 
 
 <script>

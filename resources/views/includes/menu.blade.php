@@ -20,7 +20,7 @@
       <a href="{{ route('conseil') }}" class="bg-white text-green-950 w-fit">Demander Conseils</a>
     </div>
 
-    <div href="context.html?next=suivi.html" class="block bg-green-900 border border-green-700 p-4 rounded hover:bg-green-950 flex flex-col gap-7">
+    {{-- <div href="context.html?next=suivi.html" class="block bg-green-900 border border-green-700 p-4 rounded hover:bg-green-950 flex flex-col gap-7">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bell-ring-icon lucide-bell-ring size-14"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M22 8c0-2.3-.8-4.3-2-6"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/><path d="M4 2C2.8 3.7 2 5.7 2 8"/></svg>
       <h2 class="font-semibold text-2xl">Suivi</h2>
       <div class="">
@@ -28,5 +28,5 @@
         <p class="module-description">Enregistrez vos actions pour vous les faire rappeler par un système de notifications ou .</p>
       </div>
       <a href="context.html?next=suivi.html"  class="bg-white text-green-950 w-fit">Créer des rappels</a>
-    </div>
+    </div> --}}
   </div>

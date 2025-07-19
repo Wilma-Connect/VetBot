@@ -22,9 +22,9 @@ class VetBotController extends Controller
         $request->validate([
             'experience' => 'required|string',
             'type_elevage' => 'required|string',
-            'quantite' => 'required|integer|min:1',
-            'localisation' => 'required|string',
-            'surface_m2' => 'required|integer|min:1',
+            'quantite' => 'nullable|integer|min:1',
+            'localisation' => 'nullable|string',
+            'surface_m2' => 'nullable|integer|min:1',
         ]);
 
         $conversation = new Conversation();
@@ -37,25 +37,27 @@ class VetBotController extends Controller
         $conversation->surface_m2 = $request->surface_m2;
         $conversation->save();
 
-        return redirect()->route('vetbot.chat', $conversation->id);
+         return response()->json([
+            'status' => 'success',
+            'message' => 'Conversation créée avec succès',
+            'conversation' => $conversation,
+        ]);
     }
 
-    public function chatInterface(Conversation $conversation)
+    public function getConversation(Conversation $conversation)
     {
-        // Récupère les messages du plus ancien au plus récent
-        $messages = $conversation->messages()->oldest()->get();
-
-        return view('pages.diagnostic', [
-            'step' => 'chat',
+        //Récupère les dernières conversations
+        return response()->json([
+            'status' => 'success',
             'conversation' => $conversation,
-            'messages' => $messages, // Maintenant ordonnés du plus ancien au plus récent
+            'messages' => $conversation->messages()->oldest()->get(),
         ]);
     }
 
     public function sendMessage(Request $request, Conversation $conversation)
     {
         $request->validate([
-            'content' => 'required|string',
+            'content' => 'nullable|string',
             'image' => 'nullable|image|max:5120', // 5 Mo max
         ]);
 
@@ -67,9 +69,6 @@ class VetBotController extends Controller
             $imagePath = $request->file('image')->store('vetbot-images', 's3');
             $imageUrl = env('AWS_URL') . $imagePath;
         }
-
-
-
 
 
         // Enregistrement du message utilisateur
@@ -88,9 +87,10 @@ class VetBotController extends Controller
             $prestataireTexte = $prestataires->isEmpty()
                 ? "Aucun prestataire local n'a été trouvé dans la base. Propose un service de livraison national fiable."
                 : $prestataires->map(function ($p) {
+                    $numero = preg_replace('/(\d{3})(\d{2})(\d{2})(\d{2})(\d{2})/', '+$1 $2 $3 $4 $5', $p->numero ?? '');
                     return "- **{$p->nomprestataire}**
                 - 📍 Adresse : {$p->adresse}
-                - ☎️ Téléphone : {$p->numero}
+                - ☎️ Téléphone : {$numero}
                 - ℹ️ Infos : {$p->description}";
                 })->implode("\n\n");
 
@@ -137,6 +137,7 @@ class VetBotController extends Controller
             - **Adapte tes recommandations à la ville ou région de l’éleveur** grâce à sa localisation.
             - Ne recommande que des produits **disponibles en Côte d’Ivoire**.
             - Utilise un **langage simple et pratique** pour des éleveurs de terrain sans formation vétérinaire.
+            - Pose des questions si necessaires pour affiner ta réponse et la rendre plus précise à la fin seulement si la réponse ne fait pas partie des informations sur l'éleveur.
 
             ";
 

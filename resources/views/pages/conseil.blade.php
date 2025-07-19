@@ -12,12 +12,16 @@
 
     <header class="header">
         <div class="header-nav">
+        <div class="logo">
+            <img src="assets/vetbot-logo.png" alt="VetBot Logo" class="w-auto h-16">
+            <!-- <h1>VetBot</h1> -->
+        </div>
           <div class="flex items-center gap-3">
           </div>
-          <div class="flex items-center gap-3">
+          {{-- <div class="flex items-center gap-3">
             <button id="authButton" class="auth-button">Se connecter</button>
             <button id="" class="b2">S'inscrire</button>
-          </div>
+          </div> --}}
         </div>
       </header>
 
@@ -61,6 +65,10 @@
 
   <header class="header">
     <div class="header-nav">
+      <div class="logo">
+          <img src="assets/vetbot-logo.png" alt="VetBot Logo" class="w-auto h-16">
+          <!-- <h1>VetBot</h1> -->
+      </div>
       <div class="flex items-center gap-3">
         <select id="pageSelect" class="page-select">
           <option value="suivi.html">Suivi</option>
@@ -71,10 +79,10 @@
           Historique
         </a>
       </div>
-      <div class="flex items-center gap-3">
+      {{-- <div class="flex items-center gap-3">
         <button id="authButton" class="auth-button">Se connecter</button>
         <button id="" class="b2">S'inscrire</button>
-      </div>
+      </div> --}}
     </div>
   </header>
 
@@ -120,10 +128,15 @@
                     </div>
                 </div>
             @endforeach
-
-
         </div>
     </div>
+
+    <div id="loadingMessage" class="flex justify-start mb-2 hidden">
+        <div class="bg-green-200 text-gray-700 px-4 py-2 rounded-lg text-sm animate-pulse">
+            Envoi en cours...
+        </div>
+    </div>
+
     <div class="flex items-center gap-2 mb-2 text-sm">
       <span class="text-gray-400">Suggestions :</span>
       <button class="bg-[#181818] px-2 py-1 rounded">Tremblements</button>
@@ -197,8 +210,9 @@
     const formData = new FormData(form);
     const chatInput = document.getElementById('chatInput');
     const chat = document.getElementById('chat');
+    const image = formData.get('image');
 
-    if (!chatInput.value.trim() && !formData.get('image')) {
+    if (!chatInput.value.trim() && (!image || image.size === 0)) {
         alert('Veuillez saisir un message ou sélectionner une image');
         return;
     }
@@ -208,6 +222,8 @@
     userDiv.className = 'p-3 rounded relative flex flex-col gap-1 bg-blue-100 text-right';
     userDiv.innerHTML = `<p class="text-sm whitespace-pre-wrap ia-reponse">${chatInput.value.trim()}</p>`;
     chat.appendChild(userDiv);
+
+    document.getElementById('loadingMessage').classList.remove('hidden');
 
     try {
         const response = await fetch(form.action, {
@@ -236,22 +252,23 @@
             chat.appendChild(assistantDiv);
         }
 
-    } catch (error) {
-        console.error("Erreur:", error);
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'bg-red-500 text-white p-3 rounded-lg mb-2';
-        errorDiv.textContent = "Erreur lors de l'envoi du message";
-        chat.appendChild(errorDiv);
-    } finally {
-        form.reset();
-        chat.scrollTop = chat.scrollHeight;
+        } catch (error) {
+            console.error("Erreur:", error);
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'bg-red-500 text-white p-3 rounded-lg mb-2';
+            errorDiv.textContent = "Erreur lors de l'envoi du message";
+            chat.appendChild(errorDiv);
+        } finally {
+            form.reset();
+            chat.scrollTop = chat.scrollHeight;
 
-        // ✅ Rafraîchit la page après un petit délai
-        setTimeout(() => {
-            location.reload();
-        }, 500); // Tu peux augmenter/diminuer ce délai
-    }
-});
+            // ✅ Rafraîchit la page après un petit délai
+            setTimeout(() => {
+                location.reload();
+            }, 500); // Tu peux augmenter/diminuer ce délai
+        }
+        document.getElementById('loadingMessage').classList.add('hidden');
+    });
 
   </script>
 

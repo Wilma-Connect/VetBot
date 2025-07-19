@@ -15,8 +15,8 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->uuid('conversation_id');
             $table->string('role'); // 'user' ou 'assistant'
-            $table->string('image')->nullable(); // au lieu de ->string('type')
-            $table->longText('content');
+            $table->string('image')->nullable();
+            $table->longText('content')->nullable();
             $table->timestamps();
 
             $table->foreign('conversation_id')->references('id')->on('conversations')->onDelete('cascade');

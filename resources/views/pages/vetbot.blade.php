@@ -37,15 +37,15 @@
   <header class="header bg-[#faf3e8] mt-1">
     <div class="header-nav flex flex-row justify-between">
       <div class="logo p-0">
-        <a href="index.html" class="p-0">
+        <a href="/" class="p-0">
           <img src="assets/vetbot-logo.png" alt="VetBot Logo" class="w-14 h-auto">
           <!-- <h1>VetBot</h1> -->
         </a>
       </div>
-      <div class="flex items-center gap-3">
+      {{-- <div class="flex items-center gap-3">
         <button id="authButton" class="auth-button shadow-md">Se connecter</button>
         <button id="" class="b2 shadow-md">S'inscrire</button>
-      </div>
+      </div> --}}
     </div>
   </header>
 

@@ -21,9 +21,9 @@ class VetBotConseilController extends Controller
         $request->validate([
             'experience' => 'required|string',
             'type_elevage' => 'required|string',
-            'quantite' => 'required|integer|min:1',
-            'localisation' => 'required|string',
-            'surface_m2' => 'required|integer|min:1',
+            'quantite' => 'nullable|integer|min:1',
+            'localisation' => 'nullable|string',
+            'surface_m2' => 'nullable|integer|min:1',
         ]);
 
         $conversation = new Conversation();
@@ -36,25 +36,27 @@ class VetBotConseilController extends Controller
         $conversation->surface_m2 = $request->surface_m2;
         $conversation->save();
 
-        return redirect()->route('vetbotconseil.chat', $conversation->id);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Conversation créée avec succès',
+            'conversation' => $conversation,
+        ]);
     }
 
-    public function chatInterface(Conversation $conversation)
+    public function getConversation(Conversation $conversation)
     {
         // Récupère les messages du plus ancien au plus récent
-        $messages = $conversation->messages()->oldest()->get();
-
-        return view('pages.conseil', [
-            'step' => 'chat',
+        return response()->json([
+            'status' => 'success',
             'conversation' => $conversation,
-            'messages' => $messages, // Maintenant ordonnés du plus ancien au plus récent
+            'messages' => $conversation->messages()->oldest()->get(),
         ]);
     }
 
     public function sendMessage(Request $request, Conversation $conversation)
     {
         $request->validate([
-            'content' => 'required|string',
+            'content' => 'nullable|string',
             'image' => 'nullable|image|max:5120', // 5 Mo max
         ]);
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use GuzzleHttp\Client;
 use App\Models\Message;
 use Illuminate\Support\Str;
 use App\Models\Conversation;
@@ -61,12 +62,13 @@ class VetBotConseilController extends Controller
         ]);
 
         $imagePath = null;
+        $imageBase64 = null;
 
         // Sauvegarde de l’image si envoyée
         if ($request->hasFile('image')) {
-            // Stocker sur S3 (AWS) dans le dossier vetbot-images/
             $imagePath = $request->file('image')->store('vetbot-images', 's3');
-            $imageUrl = env('AWS_URL') . $imagePath;
+            $imageContent = Storage::disk('s3')->get($imagePath);
+            $imageBase64 = base64_encode($imageContent);
         }
 
 
@@ -79,8 +81,7 @@ class VetBotConseilController extends Controller
         $userMessage->image = $imagePath ?? null; // stocke juste le chemin S3
         $userMessage->save();
 
-        // Appel API OpenAI
-        $context = "Tu es un assistant vétérinaire spécialisé dans les élevages en Côte d'Ivoire.
+        $prompt = "Tu es un assistant vétérinaire spécialisé dans les élevages en Côte d'Ivoire.
             Voici les informations sur l’élevage :
             - Expérience : {$conversation->experience}
             - Type d’élevage : {$conversation->type_elevage}
@@ -96,34 +97,46 @@ class VetBotConseilController extends Controller
             Sois clair, simple, et pertinent pour des éleveurs locaux qui n’ont pas forcément assez d'information sur l'élévage.
             ";
 
-            $messages = [
-                ["role" => "system", "content" => $context],
+        $apiKey = env('GEMINI_API_KEY');
+        $client = new Client();
+
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+
+        $contents = [];
+        if ($imageBase64) {
+            $contents[] = [
+                "inline_data" => [
+                    "mime_type" => "image/jpeg",
+                    "data" => $imageBase64,
+                ]
             ];
+        }
+        $contents[] = ["text" => $request->content ?? "Voici l'information de l'éleveur."];
+        $contents[] = ["text" => $prompt];
 
-            if ($imagePath) {
-                $imageUrl = Storage::disk('s3')->url($imagePath); // URL publique S3
-
-                $messages[] = [
-                    "role" => "user",
-                    "content" => [
-                        ["type" => "text", "text" => $request->content ?? "Voici une image à analyser."],
-                        ["type" => "image_url", "image_url" => ["url" => $imageUrl]],
-                    ],
-                ];
-            } else {
-                $messages[] = [
-                    "role" => "user",
-                    "content" => $request->content ?? "Je n'ai pas d'image à partager.",
-                ];
-            }
-
-            $openaiResponse = OpenAI::chat()->create([
-                'model' => 'gpt-4-turbo',
-                'messages' => $messages,
+        try {
+            $response = $client->post($url, [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'X-goog-api-key' => $apiKey,
+                ],
+                'json' => [
+                    "contents" => [
+                        [
+                            "role" => "user",
+                            "parts" => $contents
+                        ]
+                    ]
+                ]
             ]);
 
+            $data = json_decode($response->getBody(), true);
+            $aiContent = $data['candidates'][0]['content']['parts'][0]['text'] ?? "Désolé, je n’ai pas pu répondre.";
 
-        $aiContent = $openaiResponse['choices'][0]['message']['content'] ?? 'Désolé, je n’ai pas pu comprendre. Pouvez-vous reformuler ?';
+        } catch (\Exception $e) {
+            \Log::error('Error calling Gemini API: ' . $e->getMessage());
+            $aiContent = "Désolé, une erreur est survenue lors de la génération de la réponse.";
+        }
 
         // Enregistrement de la réponse AI
         $aiMessage = new Message();

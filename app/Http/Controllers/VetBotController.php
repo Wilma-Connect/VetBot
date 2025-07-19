@@ -20,22 +20,23 @@ class VetBotController extends Controller
 
     public function startConversation(Request $request)
     {
-        $request->validate([
-            'experience' => 'required|string',
-            'type_elevage' => 'required|string',
-            'quantite' => 'nullable|integer|min:1',
-            'localisation' => 'nullable|string',
-            'surface_m2' => 'nullable|integer|min:1',
-        ]);
+        $user = auth()->user();
+
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Utilisateur non authentifié',
+            ], 401);
+        }
 
         $conversation = new Conversation();
         $conversation->id = Str::uuid();
-        $conversation->user_id = auth()->check() ? auth()->id() : null;
-        $conversation->experience = $request->experience;
-        $conversation->type_elevage = $request->type_elevage;
-        $conversation->quantite = $request->quantite;
-        $conversation->localisation = $request->localisation;
-        $conversation->surface_m2 = $request->surface_m2;
+        $conversation->user_id = $user->id;
+        $conversation->experience = $user->experience;
+        $conversation->type_elevage = $user->type_elevage;
+        $conversation->quantite = $user->quantite;
+        $conversation->localisation = $user->localisation;
+        $conversation->surface_m2 = $user->surface_m2;
         $conversation->save();
 
         return response()->json([
@@ -43,8 +44,8 @@ class VetBotController extends Controller
             'message' => 'Conversation créée avec succès',
             'conversation' => $conversation,
         ]);
-
     }
+
 
     public function getConversation(Conversation $conversation)
     {
@@ -191,6 +192,7 @@ class VetBotController extends Controller
 
     public function sendMessage(Request $request, Conversation $conversation)
     {
+
         $request->validate([
             'content' => 'nullable|string',
             'image' => 'nullable|image|max:5120',
@@ -208,7 +210,7 @@ class VetBotController extends Controller
         $userMessage = new Message();
         $userMessage->id = Str::uuid();
         $userMessage->conversation_id = $conversation->id;
-        $userMessage->role = 'user';
+        $userMessage->role = 'eleveur';
         $userMessage->content = $request->content;
         $userMessage->image = $imagePath ?? null;
         $userMessage->save();
@@ -318,7 +320,7 @@ class VetBotController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'content' => $aiContent,
+            'content' => (string) str_replace(["\r", "\n"], ' ', $aiContent), // pas de retour à la ligne
             'message' => $aiMessage->id,
         ]);
     }

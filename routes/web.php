@@ -26,10 +26,10 @@ Route::get('conseil',[HomeController::class, 'conseil'])->name('conseil');
 
 
 /******************************DIAGNOSTIC *******************************/
-Route::get('/vetbot/diagnostic', [VetBotController::class, 'showInitForm'])->name('vetbot.init');
+/* Route::get('/vetbot/diagnostic', [VetBotController::class, 'showInitForm'])->name('vetbot.init');
 Route::post('/vetbot/diagnostic/start', [VetBotController::class, 'startConversation'])->name('vetbot.start');
 Route::get('/vetbot/diagnostic/{conversation}', [VetBotController::class, 'getConversation'])->name('vetbot.chat');
-Route::post('/vetbot/diagnostic/{conversation}/send', [VetBotController::class, 'sendMessage'])->name('vetbot.send');
+Route::post('/vetbot/diagnostic/{conversation}/send', [VetBotController::class, 'sendMessage'])->name('vetbot.send'); */
 
 
 

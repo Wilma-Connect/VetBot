@@ -19,13 +19,14 @@ class VetBotConseilController extends Controller
 
     public function startConversation(Request $request)
     {
-        $request->validate([
-            'experience' => 'required|string',
-            'type_elevage' => 'required|string',
-            'quantite' => 'nullable|integer|min:1',
-            'localisation' => 'nullable|string',
-            'surface_m2' => 'nullable|integer|min:1',
-        ]);
+        $user = auth()->user();
+
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Utilisateur non authentifié',
+            ], 401);
+        }
 
         $conversation = new Conversation();
         $conversation->id = Str::uuid();
@@ -72,11 +73,11 @@ class VetBotConseilController extends Controller
         }
 
 
-        // Enregistrement du message utilisateur
+        //Enregistrement du message utilisateur
         $userMessage = new Message();
         $userMessage->id = Str::uuid();
         $userMessage->conversation_id = $conversation->id;
-        $userMessage->role = 'user';
+        $userMessage->role = 'eleveur';
         $userMessage->content = $request->content;
         $userMessage->image = $imagePath ?? null; // stocke juste le chemin S3
         $userMessage->save();

@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\VetBotController;
 use App\Http\Controllers\VetBotConseilController;
 
@@ -20,14 +21,24 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-/******************************DIAGNOSTIC *******************************/
-Route::post('/vetbot/diagnostic/start', [VetBotController::class, 'startConversation']);
-Route::get('/vetbot/diagnostic/{conversation}', [VetBotController::class, 'getConversation']);
-Route::post('/vetbot/diagnostic/{conversation}/send', [VetBotController::class, 'sendMessage']);
 
+/******************************Authentification*******************************/
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
+
+
+/******************************DIAGNOSTIC *******************************/
+Route::middleware('auth:sanctum')->prefix('/vetbot/diagnostic')->group(function () {
+    Route::post('/start', [VetBotController::class, 'startConversation']);
+    Route::get('/{conversation}', [VetBotController::class, 'getConversation']);
+    Route::post('/{conversation}/send', [VetBotController::class, 'sendMessage']);
+});
 
 
 /******************************Conseils*******************************/
-Route::post('/vetbot/conseil/start', [VetBotConseilController::class, 'startConversation']);
-Route::get('/vetbot/conseil/{conversation}', [VetBotConseilController::class, 'getConversation']);
-Route::post('/vetbot/conseil/{conversation}/send', [VetBotConseilController::class, 'sendMessage']);
+Route::middleware('auth:sanctum')->prefix('/vetbot/conseil')->group(function () {
+    Route::post('/start', [VetBotConseilController::class, 'startConversation']);
+    Route::get('/{conversation}', [VetBotConseilController::class, 'getConversation']);
+    Route::post('/{conversation}/send', [VetBotConseilController::class, 'sendMessage']);
+});

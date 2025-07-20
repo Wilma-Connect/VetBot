@@ -30,12 +30,12 @@ class VetBotConseilController extends Controller
 
         $conversation = new Conversation();
         $conversation->id = Str::uuid();
-        $conversation->user_id = auth()->check() ? auth()->id() : null;
-        $conversation->experience = $request->experience;
-        $conversation->type_elevage = $request->type_elevage;
-        $conversation->quantite = $request->quantite;
-        $conversation->localisation = $request->localisation;
-        $conversation->surface_m2 = $request->surface_m2;
+        $conversation->user_id = $user->id;
+        $conversation->experience = $user->experience;
+        $conversation->type_elevage = $user->type_elevage;
+        $conversation->quantite = $user->quantite;
+        $conversation->localisation = $user->ville;
+        $conversation->surface_m2 = $user->surface_m2;
         $conversation->save();
 
         return response()->json([

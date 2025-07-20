@@ -35,7 +35,7 @@ class VetBotController extends Controller
         $conversation->experience = $user->experience;
         $conversation->type_elevage = $user->type_elevage;
         $conversation->quantite = $user->quantite;
-        $conversation->localisation = $user->localisation;
+        $conversation->localisation = $user->ville;
         $conversation->surface_m2 = $user->surface_m2;
         $conversation->save();
 

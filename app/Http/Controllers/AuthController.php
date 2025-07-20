@@ -35,7 +35,7 @@ class AuthController extends Controller
                 'experience' => $validatedData['experience'],
                 'type_elevage' => $request->type_elevage,
                 'quantite' => $request->quantite,
-                'localisation' => $request->localisation,
+                //'localisation' => $request->localisation,
                 'surface_m2' => $request->surface_m2,
             ]);
 

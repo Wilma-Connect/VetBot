@@ -20,6 +20,7 @@ return new class extends Migration
             $table->integer('quantite')->nullable();
             $table->string('localisation')->nullable();
             $table->integer('surface_m2')->nullable();
+            $table->string('service')->nullable();
             $table->timestamps();
         });
     }

@@ -36,6 +36,7 @@ class VetBotConseilController extends Controller
         $conversation->quantite = $user->quantite;
         $conversation->localisation = $user->ville;
         $conversation->surface_m2 = $user->surface_m2;
+        $conversation->service = 'conseil';
         $conversation->save();
 
         return response()->json([
@@ -151,6 +152,24 @@ class VetBotConseilController extends Controller
             'status' => 'success',
             'content' => $aiContent,
             'message' => $aiMessage->id // Optionnel: pour le suivi
+        ]);
+    }
+
+    public function getUserConversations(Request $request)
+    {
+        $user = $request->user();
+
+        $conversations = Conversation::where('user_id', $user->id)
+            ->where('service', 'conseil')
+            ->with(['messages' => function ($q) {
+                $q->latest()->take(1);
+            }])
+            ->orderByDesc('updated_at')
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'conversations' => $conversations
         ]);
     }
 }

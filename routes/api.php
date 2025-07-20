@@ -31,6 +31,7 @@ Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logo
 /******************************DIAGNOSTIC *******************************/
 Route::middleware('auth:sanctum')->prefix('/vetbot/diagnostic')->group(function () {
     Route::post('/start', [VetBotController::class, 'startConversation']);
+    Route::get('/user-conversations', [VetBotController::class, 'getUserConversations']);
     Route::get('/{conversation}', [VetBotController::class, 'getConversation']);
     Route::post('/{conversation}/send', [VetBotController::class, 'sendMessage']);
 });
@@ -39,6 +40,7 @@ Route::middleware('auth:sanctum')->prefix('/vetbot/diagnostic')->group(function 
 /******************************Conseils*******************************/
 Route::middleware('auth:sanctum')->prefix('/vetbot/conseil')->group(function () {
     Route::post('/start', [VetBotConseilController::class, 'startConversation']);
+    Route::get('/user-conversations', [VetBotConseilController::class, 'getUserConversations']);
     Route::get('/{conversation}', [VetBotConseilController::class, 'getConversation']);
     Route::post('/{conversation}/send', [VetBotConseilController::class, 'sendMessage']);
 });
